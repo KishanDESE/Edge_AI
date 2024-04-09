@@ -1,5 +1,5 @@
 /**
- * Test sinewave neural network model
+ * General model deployment
  * 
  * Author: Pete Warden
  * Modified by: Shawn Hymel
