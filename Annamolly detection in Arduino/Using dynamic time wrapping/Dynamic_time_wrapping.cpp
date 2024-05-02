@@ -26,7 +26,7 @@
 
 list * mean = NULL;
 
-int data_no=21;
+extern int data_no;
 
 
 
@@ -43,11 +43,49 @@ int* list_to_array (list *head,int size){
     return arr;
 }
 
+
+int * new_input(int( * input)()){
+
+  Serial.println("Please enter the time series data that you want to compare.");
+
+int Size_of_comparing_data = data_no + 1;
+    Serial.println("Write new time series : -------------------------------------->");
+    
+int* myArray = new int[Size_of_comparing_data];
+    for (int i = 0; i < Size_of_comparing_data; ) {
+//    while (!Serial.available()) {} // Wait until data is available
+//    myArray[i] = Serial.parseInt(); // Read integer from Serial
+
+myArray[i] = input();
+
+if(myArray[i] !=0)
+{
+                                       Serial.println(myArray[i]);
+    i++;
+}
+//    while (Serial.read() != '\n') {} // Clear remaining data in Serial buffer
+  }
+return myArray;
+}
+
+
+
 int * dynamic_time_wrapping (int *input, int *pattern) {
     
     int *out = new int[2];
     out[1] =0;
         //     Create data_no*data_no matrix
+        int matrix[2][data_no];
+        //First row and column is max to be putted
+        for (int i =0 ; i<2 ;i++)
+        matrix[i][0] = 5000;
+        
+        for(int j =0 ; j<data_no  ;j++)
+        matrix[0][j] = 5000;
+        
+        matrix[0][0] = 0;
+   /*   NORMAL DTW  
+    *  //     Create data_no*data_no matrix
         int matrix[data_no][data_no];
         //First row and column is max to be putted
         for (int i =0 ; i<data_no ;i++)
@@ -70,7 +108,32 @@ int * dynamic_time_wrapping (int *input, int *pattern) {
             }
             
         }
-        out[0] = matrix[data_no-1][data_no -1];
+    */
+
+//Modified for less space
+        Serial.println("Progress bar");
+        for(int i = 1 ; i <data_no ; i++)
+        {matrix[1][0] = 5000;
+        if(i>1)
+        matrix[0][0] = 5000;
+        
+            for (int k = 0; k < i; k++) {
+            Serial.print("=");
+            }
+              Serial.println(" ");
+            for(int j = 1; j < data_no  ; j++ )
+            {
+               matrix[1][j] = abs(pattern[i] - input[j]) + min(min(matrix[0][j-1],matrix[0][j]),matrix[1][j-1]);
+              out[1] = out[1] + matrix[1][j];
+            }    
+            for(int j = 1; j < data_no  ; j++ )
+                  {
+                    matrix[0][j] = matrix[1][j];
+                  } 
+        }
+
+
+        out[0] = matrix[1][data_no -1];
     
         
         return out;
